@@ -13,15 +13,27 @@ const initialModuleForm = {
   title: '',
   description: '',
   prerequisites: [],
+  icon: 'book',
 };
 
 const initialLessonForm = {
   id: null,
   module_id: '',
   title: '',
+  description: '',
   read_time: 5,
   content: '',
 };
+
+const lessonSyntaxTemplate = `<h2>Section Heading</h2>
+<p>This lesson supports <strong>bold text</strong>, paragraphs, and code blocks.</p>
+
+<pre><code>import React from 'react';
+import { View, Text } from 'react-native';
+
+export default function Example() {
+  return <Text>Hello React Native</Text>;
+}</code></pre>`;
 
 const initialAppContentForm = {
   welcome_title: '',
@@ -177,6 +189,7 @@ function App() {
       title: moduleItem.title || '',
       description: moduleItem.description || '',
       prerequisites: parsePrerequisites(moduleItem.prerequisites),
+      icon: moduleItem.icon || 'book',
     });
     setModulePrerequisiteInput('');
     setIsModuleModalOpen(true);
@@ -217,6 +230,7 @@ function App() {
         title: moduleForm.title,
         description: moduleForm.description,
         prerequisites: moduleForm.prerequisites.join(', '),
+        icon: moduleForm.icon,
       };
 
       if (moduleForm.id) {
@@ -267,6 +281,7 @@ function App() {
         id: fullLesson.id,
         module_id: String(fullLesson.module_id),
         title: fullLesson.title || '',
+        description: fullLesson.description || '',
         read_time: Number(fullLesson.read_time) || 5,
         content: fullLesson.content || '',
       });
@@ -285,6 +300,7 @@ function App() {
       const payload = {
         module_id: Number(lessonForm.module_id),
         title: lessonForm.title,
+        description: lessonForm.description,
         content: lessonForm.content,
         read_time: Number(lessonForm.read_time) || 5,
       };
@@ -484,6 +500,7 @@ function App() {
                     <tr>
                       <th>Title</th>
                       <th>Description</th>
+                      <th>Icon / Image</th>
                       <th>Prerequisites</th>
                       <th>Lessons</th>
                       <th>Total Time</th>
@@ -496,6 +513,7 @@ function App() {
                         <tr key={moduleItem.id}>
                           <td>{moduleItem.title}</td>
                           <td>{moduleItem.description || '-'}</td>
+                          <td>{moduleItem.icon || '-'}</td>
                           <td>{moduleItem.prerequisites || '-'}</td>
                           <td>{moduleItem.lesson_count}</td>
                           <td>{moduleItem.total_read_time} min</td>
@@ -511,7 +529,7 @@ function App() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="6" className="empty">
+                        <td colSpan="7" className="empty">
                           No modules yet.
                         </td>
                       </tr>
@@ -636,6 +654,15 @@ function App() {
                 />
               </label>
 
+              <label className="field-row">
+                <span>Module Icon or Image URL</span>
+                <input
+                  placeholder="Example: book OR https://.../icon.png"
+                  value={moduleForm.icon}
+                  onChange={(event) => setModuleForm({ ...moduleForm, icon: event.target.value })}
+                />
+              </label>
+
               <div className="chip-input-wrap">
                 <label>Prerequisites</label>
                 <div className="chip-input-row">
@@ -730,6 +757,34 @@ function App() {
                   onChange={(event) => setLessonForm({ ...lessonForm, read_time: event.target.value })}
                 />
               </label>
+
+              <label className="field-row">
+                <span>Lesson Description</span>
+                <textarea
+                  rows="3"
+                  placeholder="Short summary shown in lesson list"
+                  value={lessonForm.description}
+                  onChange={(event) => setLessonForm({ ...lessonForm, description: event.target.value })}
+                />
+              </label>
+
+              <details className="syntax-help">
+                <summary>How to add syntax highlighted content</summary>
+                <p>Use basic HTML for headings and bold text. Wrap code in pre + code blocks.</p>
+                <pre>{lessonSyntaxTemplate}</pre>
+                <button
+                  type="button"
+                  className="secondary compact-btn"
+                  onClick={() =>
+                    setLessonForm((prev) => ({
+                      ...prev,
+                      content: prev.content ? `${prev.content}\n\n${lessonSyntaxTemplate}` : lessonSyntaxTemplate,
+                    }))
+                  }
+                >
+                  Insert Syntax Template
+                </button>
+              </details>
 
               <label className="field-row">
                 <span>Lesson Content</span>
